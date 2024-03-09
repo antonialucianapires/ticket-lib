@@ -1,4 +1,4 @@
-package com.alps.core;
+package com.alps.core.user;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
