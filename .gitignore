@@ -64,5 +64,7 @@ buildNumber.properties
 # Ignore all local history of files
 .history
 .ionide
-
+.vscode
+./.vscode
+vscode
 # End of https://www.toptal.com/developers/gitignore/api/visualstudiocode,java,maven
