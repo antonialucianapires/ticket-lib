@@ -56,4 +56,9 @@ public class Session {
     public Set<LocationSeat> getSeats() {
         return Collections.unmodifiableSet(seats);
     }
+
+    public boolean isActive() {
+        LocalDateTime now = LocalDateTime.now();
+        return now.isAfter(startTime) && now.isBefore(endTime);
+    }
 }
