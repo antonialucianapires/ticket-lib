@@ -1,5 +1,6 @@
 package com.alps.core.location;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -22,26 +23,27 @@ public class LocationSeatTest {
     void setup() {
         lockProvider = new ReentrantLockProvider();
         location = new SomeLocation();
-        locationSeat = new LocationSeat(UUID.randomUUID().toString(), "M1 - Seat", location, lockProvider, true);
+        locationSeat = LocationSeat.create(UUID.randomUUID().toString(), "M1 - Seat", location, lockProvider, true);
     }
 
     @Test
     void shoudlReserveSeat() {
-        locationSeat.reserveSeat();
-        assertFalse(locationSeat.isAvailable());
+        LocationSeat reservedLocation = locationSeat.reserveSeat();
+        assertFalse(reservedLocation.isAvailable());
     }
 
     @Test
     void shoudlReleaseSeat() {
-        locationSeat.reserveSeat();
-        locationSeat.releaseSeat();
-        assertTrue(locationSeat.isAvailable());
+        LocationSeat reservedLocation = locationSeat.reserveSeat();
+        LocationSeat locationReleased = reservedLocation.releaseSeat();
+        assertEquals(reservedLocation.getSeatId(), locationReleased.getSeatId());
+        assertTrue(locationReleased.isAvailable());
     }
 
     @Test
     void shoudlThrowExceptionWhenReservingReservedSeat() {
-        locationSeat.reserveSeat();
-        assertThrows(IllegalStateException.class, () -> locationSeat.reserveSeat());
+        LocationSeat reservedLocation = locationSeat.reserveSeat();
+        assertThrows(IllegalStateException.class, () -> reservedLocation.reserveSeat());
     }
 
     @Test

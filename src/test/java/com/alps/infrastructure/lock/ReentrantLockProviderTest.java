@@ -1,6 +1,7 @@
 package com.alps.infrastructure.lock;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -27,9 +28,10 @@ public class ReentrantLockProviderTest {
     }
 
     @Test
-    void shouldUnlockWhenLockIsNotLocked() {
-        lockProvider.unlock();
-        assertFalse(lockProvider.isLocked());
+    void shouldThrowExceptionWhenUnlockingWithoutLocking() {
+        assertThrows(IllegalMonitorStateException.class, () -> {
+            lockProvider.unlock();
+        });
     }
 
 }

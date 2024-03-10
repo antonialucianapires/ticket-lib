@@ -25,7 +25,7 @@ public class InMemoryUserRepositoryTest {
 
     @Test
     void shouldSaveAndFindUserById() {
-        User user = new User("1", "John Doe", "john.doe@example.com");
+        User user = User.create("1", "John Doe", "john.doe@example.com");
         userRepository.save(user);
         User foundUser = userRepository.findById("1");
         assertNotNull(foundUser);
@@ -36,7 +36,7 @@ public class InMemoryUserRepositoryTest {
 
     @Test
     void shouldDeleteUser() {
-        User user = new User("2", "Jane Doe", "jane.doe@example.com");
+        User user = User.create("2", "Jane Doe", "jane.doe@example.com");
         userRepository.save(user);
         userRepository.delete("2");
         assertNull(userRepository.findById("2"));
@@ -46,13 +46,13 @@ public class InMemoryUserRepositoryTest {
     void shouldHandleConcurrentOperations() throws ExecutionException, InterruptedException {
         ExecutorService executorService = Executors.newFixedThreadPool(2);
         Future<User> future1 = executorService.submit(() -> {
-            User user = new User("3", "Concurrent User 1", "concurrent1@example.com");
+            User user = User.create("3", "Concurrent User 1", "concurrent1@example.com");
             userRepository.save(user);
             return userRepository.findById("3");
         });
 
         Future<User> future2 = executorService.submit(() -> {
-            User user = new User("4", "Concurrent User 2", "concurrent2@example.com");
+            User user = User.create("4", "Concurrent User 2", "concurrent2@example.com");
             userRepository.save(user);
             return userRepository.findById("4");
         });

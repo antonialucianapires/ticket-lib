@@ -3,8 +3,12 @@ package com.alps.core.user;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NonNull;
 
+@Getter
+@EqualsAndHashCode
 public class User {
     private final String id;
     private final String name;
@@ -13,7 +17,7 @@ public class User {
     private static final Pattern EMAIL_PATTERN = Pattern
             .compile("^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$");
 
-    public User(
+    private User(
             @NonNull String id,
             @NonNull String name,
             @NonNull String email) {
@@ -27,16 +31,15 @@ public class User {
         this.email = email;
     }
 
-    public String getId() {
-        return id;
-    }
+    public static User create(
+            @NonNull String id,
+            @NonNull String name,
+            @NonNull String email) {
 
-    public String getName() {
-        return name;
-    }
-
-    public String getEmail() {
-        return email;
+        return new User(
+                id,
+                name,
+                email);
     }
 
     public User withName(String newName) {

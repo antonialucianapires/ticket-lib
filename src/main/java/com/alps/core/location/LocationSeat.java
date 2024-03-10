@@ -2,16 +2,20 @@ package com.alps.core.location;
 
 import com.alps.core.lock.LockProvider;
 
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NonNull;
 
+@Getter
+@EqualsAndHashCode
 public class LocationSeat {
     private final String seatId;
     private final String description;
-    private boolean isAvailable;
+    private final boolean isAvailable;
     private final Location location;
     private final LockProvider lockProvider;
 
-    public LocationSeat(
+    private LocationSeat(
             @NonNull String seatId,
             @NonNull String description,
             @NonNull Location location,
@@ -25,27 +29,31 @@ public class LocationSeat {
         this.lockProvider = lockProvider;
     }
 
-    public String getSeatId() {
-        return seatId;
+    public static LocationSeat create(
+            @NonNull String seatId,
+            @NonNull String description,
+            @NonNull Location location,
+            @NonNull LockProvider lockProvider,
+            boolean isAvailable) {
+        return new LocationSeat(
+                seatId,
+                description,
+                location,
+                lockProvider,
+                isAvailable);
     }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public boolean isAvailable() {
-        return isAvailable;
-    }
-
-    public Location getLocation() {
-        return location;
-    }
-
-    public void reserveSeat() {
+    public LocationSeat reserveSeat() {
         lockProvider.lock();
         try {
             if (isAvailable) {
-                isAvailable = false;
+                return new LocationSeat(
+                        seatId,
+                        description,
+                        location,
+                        lockProvider,
+                        false);
+
             } else {
                 throw new IllegalStateException("Seat is already reserved.");
             }
@@ -55,11 +63,16 @@ public class LocationSeat {
         }
     }
 
-    public void releaseSeat() {
+    public LocationSeat releaseSeat() {
         lockProvider.lock();
         try {
             if (!isAvailable) {
-                isAvailable = true;
+                return new LocationSeat(
+                        seatId,
+                        description,
+                        location,
+                        lockProvider,
+                        true);
             } else {
                 throw new IllegalStateException("Seat is already available.");
             }
