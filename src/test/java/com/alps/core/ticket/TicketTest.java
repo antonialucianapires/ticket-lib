@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import com.alps.core.location.Location;
 import com.alps.core.location.LocationSeat;
 import com.alps.core.lock.LockProvider;
+import com.alps.core.price.Price;
 import com.alps.core.reservation.Reservation;
 import com.alps.core.reservation.ReservationStatus;
 import com.alps.core.session.Session;
@@ -28,7 +29,7 @@ public class TicketTest {
     LocationSeat locationSeat;
     Session session;
     Reservation reservation;
-    BigDecimal price;
+    Price price;
     LocalDate validUntil;
     LockProvider lockProvider;
     Location location;
@@ -41,9 +42,9 @@ public class TicketTest {
         locationSeat = LocationSeat.create("1", "locationSeat", location, lockProvider, true);
         session = Session.create("1", "Session 1", LocalDateTime.now(), LocalDateTime.now().plusHours(1), location,
                 Collections.singleton(locationSeat));
+        price = new Price(BigDecimal.valueOf(100));
         reservation = Reservation.create("1", user, session, Collections.singleton(locationSeat), LocalDateTime.now(),
-                Duration.ofHours(2), lockProvider, new ReservationStatus(ReservationStatus.StandardStatus.PENDING));
-        price = BigDecimal.valueOf(100);
+                Duration.ofHours(2), lockProvider, new ReservationStatus(ReservationStatus.StandardStatus.PENDING), price);
         validUntil = LocalDate.now().plusDays(1);
     }
 

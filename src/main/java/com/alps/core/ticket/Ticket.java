@@ -1,9 +1,9 @@
 package com.alps.core.ticket;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import com.alps.core.location.LocationSeat;
+import com.alps.core.price.Price;
 import com.alps.core.reservation.Reservation;
 import com.alps.core.session.Session;
 import com.alps.core.user.User;
@@ -21,7 +21,7 @@ public class Ticket {
     private final LocationSeat locationSeat;
     private final Session session;
     private final Reservation reservation;
-    private final BigDecimal price;
+    private final Price price;
     private final LocalDate validUntil;
     private boolean used;
 
@@ -31,7 +31,7 @@ public class Ticket {
             @NonNull LocationSeat locationSeat,
             @NonNull Session session,
             @NonNull Reservation reservation,
-            @NonNull BigDecimal price,
+            @NonNull Price price,
             @NonNull LocalDate validUntil,
             boolean used) {
 
@@ -52,7 +52,7 @@ public class Ticket {
             LocationSeat locationSeat,
             Session session,
             Reservation reservation,
-            BigDecimal price,
+            Price price,
             LocalDate validUntil,
             boolean used) {
 

@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import com.alps.core.clock.SystemClock;
 import com.alps.core.location.LocationSeat;
 import com.alps.core.lock.LockProvider;
+import com.alps.core.price.Price;
 import com.alps.core.reservation.ReservationStatus.StandardStatus;
 import com.alps.core.session.Session;
 import com.alps.core.user.User;
@@ -33,6 +34,7 @@ public class Reservation {
     private final ReservationStatus status;
     private final LockProvider lockProvider;
     private final SystemClock systemClock;
+    private final Price price;
 
     private Reservation(
             @NonNull String reservationId,
@@ -42,7 +44,8 @@ public class Reservation {
             @NonNull LocalDateTime creationTime,
             @NonNull Duration expirationTime,
             @NonNull ReservationStatus status,
-            @NonNull LockProvider lockProvider) {
+            @NonNull LockProvider lockProvider,
+            @NonNull Price price) {
         this.reservationId = reservationId;
         this.user = user;
         this.session = session;
@@ -52,6 +55,7 @@ public class Reservation {
         this.status = status == null ? new ReservationStatus(StandardStatus.PENDING) : status;
         this.lockProvider = lockProvider;
         this.systemClock = new SystemClock(lockProvider);
+        this.price = price;
 
     }
 
@@ -62,7 +66,8 @@ public class Reservation {
             @NonNull Set<LocationSeat> seats,
             @NonNull LocalDateTime creationTime,
             @NonNull Duration expirationTime,
-            @NonNull ReservationStatus status) {
+            @NonNull ReservationStatus status,
+            @NonNull Price price) {
 
         this.reservationId = reservationId;
         this.user = user;
@@ -73,6 +78,7 @@ public class Reservation {
         this.status = status;
         this.lockProvider = null;
         this.systemClock = new SystemClock(lockProvider);
+        this.price = price;
     }
 
     public static Reservation create(
@@ -83,7 +89,8 @@ public class Reservation {
             @NonNull LocalDateTime creationTime,
             @NonNull Duration expirationTime,
             @NonNull LockProvider lockProvider,
-            ReservationStatus status) {
+            ReservationStatus status,
+            @NonNull Price price) {
 
         Set<LocationSeat> reservedSeats = seats.stream()
                 .map(LocationSeat::reserveSeat)
@@ -97,7 +104,8 @@ public class Reservation {
                 creationTime,
                 expirationTime,
                 status == null ? new ReservationStatus(StandardStatus.PENDING) : status,
-                lockProvider);
+                lockProvider,
+                price);
     }
 
     public Set<LocationSeat> getSeats() {
@@ -128,7 +136,8 @@ public class Reservation {
                         locationsReleased,
                         this.creationTime,
                         this.expirationTime,
-                        new ReservationStatus(ReservationStatus.StandardStatus.CANCELLED));
+                        new ReservationStatus(ReservationStatus.StandardStatus.CANCELLED),
+                        this.price);
             } else {
                 throw new IllegalStateException("The reservation cannot be canceled in its current state.");
             }

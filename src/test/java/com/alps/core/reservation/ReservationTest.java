@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
@@ -21,6 +22,7 @@ import com.alps.core.clock.SystemClock;
 import com.alps.core.location.Location;
 import com.alps.core.location.LocationSeat;
 import com.alps.core.lock.LockProvider;
+import com.alps.core.price.Price;
 import com.alps.core.session.Session;
 import com.alps.core.user.User;
 import com.alps.infrastructure.lock.ReentrantLockProvider;
@@ -38,6 +40,7 @@ public class ReservationTest {
     LockProvider lockProvider;
     Clock clock;
     SystemClock systemClock;
+    Price price;
 
     @BeforeEach
     void setup() {
@@ -52,6 +55,7 @@ public class ReservationTest {
         creationTime = LocalDateTime.now();
         expirationTime = Duration.ofHours(1);
         clock = Clock.fixed(Instant.now(), ZoneId.systemDefault());
+        price = new Price(BigDecimal.valueOf(100));
 
         reservation = Reservation.create(
                 "1",
@@ -61,7 +65,8 @@ public class ReservationTest {
                 creationTime,
                 expirationTime,
                 lockProvider,
-                null);
+                null,
+                price);
     }
 
     @Test
@@ -75,7 +80,8 @@ public class ReservationTest {
                     creationTime,
                     expirationTime,
                     lockProvider,
-                    reservationStatus);
+                    reservationStatus,
+                    price);
         });
 
         assertThrows(NullPointerException.class, () -> {
@@ -87,7 +93,8 @@ public class ReservationTest {
                     creationTime,
                     expirationTime,
                     lockProvider,
-                    reservationStatus);
+                    reservationStatus,
+                    price);
         });
 
         assertThrows(NullPointerException.class, () -> {
@@ -99,7 +106,8 @@ public class ReservationTest {
                     creationTime,
                     expirationTime,
                     lockProvider,
-                    reservationStatus);
+                    reservationStatus,
+                    price);
         });
 
         assertThrows(NullPointerException.class, () -> {
@@ -111,7 +119,8 @@ public class ReservationTest {
                     creationTime,
                     expirationTime,
                     lockProvider,
-                    reservationStatus);
+                    reservationStatus,
+                    price);
         });
 
         assertThrows(NullPointerException.class, () -> {
@@ -123,7 +132,8 @@ public class ReservationTest {
                     null,
                     expirationTime,
                     lockProvider,
-                    reservationStatus);
+                    reservationStatus,
+                    price);
         });
 
         assertThrows(NullPointerException.class, () -> {
@@ -135,7 +145,8 @@ public class ReservationTest {
                     creationTime,
                     null,
                     lockProvider,
-                    reservationStatus);
+                    reservationStatus,
+                    price);
         });
 
         assertThrows(NullPointerException.class, () -> {
@@ -147,8 +158,24 @@ public class ReservationTest {
                     creationTime,
                     expirationTime,
                     null,
-                    reservationStatus);
+                    reservationStatus,
+                    price);
         });
+
+        assertThrows(NullPointerException.class, () -> {
+            Reservation.create(
+                    "1",
+                    user,
+                    session,
+                    seats,
+                    creationTime,
+                    expirationTime,
+                    lockProvider,
+                    reservationStatus,
+                    null);
+        });
+
+        
 
     }
 
@@ -170,7 +197,8 @@ public class ReservationTest {
                 creationTime,
                 expirationTime,
                 lockProvider,
-                new ReservationStatus(ReservationStatus.StandardStatus.COMPLETE));
+                new ReservationStatus(ReservationStatus.StandardStatus.COMPLETE),
+                price);
 
         assertThrows(IllegalStateException.class, () -> {
             reservation.cancel();
@@ -187,7 +215,8 @@ public class ReservationTest {
                 creationTime,
                 expirationTime,
                 lockProvider,
-                new ReservationStatus(ReservationStatus.StandardStatus.PENDING));
+                new ReservationStatus(ReservationStatus.StandardStatus.PENDING),
+                price);
 
         assertEquals(reservation, otherReservation);
         assertEquals(reservation.hashCode(), otherReservation.hashCode());
@@ -203,7 +232,8 @@ public class ReservationTest {
                 creationTime,
                 expirationTime,
                 lockProvider,
-                new ReservationStatus(ReservationStatus.StandardStatus.COMPLETE));
+                new ReservationStatus(ReservationStatus.StandardStatus.COMPLETE),
+                price);
 
         assertNotEquals(reservation, otherReservation);
     }
