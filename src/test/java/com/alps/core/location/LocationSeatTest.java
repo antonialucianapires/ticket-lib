@@ -28,27 +28,27 @@ public class LocationSeatTest {
 
     @Test
     void shoudlReserveSeat() {
-        LocationSeat reservedLocation = locationSeat.reserveSeat();
+        LocationSeat reservedLocation = locationSeat.reserve();
         assertFalse(reservedLocation.isAvailable());
     }
 
     @Test
     void shoudlReleaseSeat() {
-        LocationSeat reservedLocation = locationSeat.reserveSeat();
-        LocationSeat locationReleased = reservedLocation.releaseSeat();
+        LocationSeat reservedLocation = locationSeat.reserve();
+        LocationSeat locationReleased = reservedLocation.release();
         assertEquals(reservedLocation.getSeatId(), locationReleased.getSeatId());
         assertTrue(locationReleased.isAvailable());
     }
 
     @Test
     void shoudlThrowExceptionWhenReservingReservedSeat() {
-        LocationSeat reservedLocation = locationSeat.reserveSeat();
-        assertThrows(IllegalStateException.class, () -> reservedLocation.reserveSeat());
+        LocationSeat reservedLocation = locationSeat.reserve();
+        assertThrows(IllegalStateException.class, () -> reservedLocation.reserve());
     }
 
     @Test
     void shoudlThrowExceptionWhenReleasingAvailableSeat() {
-        assertThrows(IllegalStateException.class, () -> locationSeat.releaseSeat());
+        assertThrows(IllegalStateException.class, () -> locationSeat.release());
     }
 
     class SomeLocation implements Location {
