@@ -16,7 +16,6 @@ import java.util.Collections;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.alps.core.clock.SystemClock;
 import com.alps.core.location.Location;
 import com.alps.core.location.LocationSeat;
 import com.alps.core.lock.LockProvider;
@@ -38,13 +37,11 @@ public class TicketTest {
     LocalDate validUntil;
     LockProvider lockProvider;
     Location location;
-    SystemClock systemClock;
 
     @BeforeEach
     public void setup() {
         location = new SomeLocation();
         lockProvider = new ReentrantLockProvider();
-        systemClock = new SystemClock(lockProvider);
         user = User.create("1", "John Doe", "john.doe@example.com");
         locationSeat = LocationSeat.create("1", "locationSeat", location, lockProvider, true);
         session = mock(Session.class);
@@ -58,8 +55,7 @@ public class TicketTest {
                 Duration.ofHours(2),
                 lockProvider,
                 new ReservationStatus(ReservationStatus.StandardStatus.PENDING),
-                price,
-                systemClock);
+                price);
         validUntil = LocalDate.now().plusDays(1);
     }
 

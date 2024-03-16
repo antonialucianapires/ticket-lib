@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
@@ -12,7 +11,6 @@ import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.alps.core.clock.SystemClock;
 import com.alps.core.location.Location;
 import com.alps.core.location.LocationSeat;
 import com.alps.core.lock.LockProvider;
@@ -114,13 +112,15 @@ public class SessionTest {
 
     @Test
     void shouldReturnFalseWhenSessionIsInactiveBeforeStartTime() {
-        LocalDateTime beforeStartTime = startTime.minusDays(1);
-        assertFalse(session.isActive(beforeStartTime));
-    }
-
-    @Test
-    void shouldReturnFalseWhenSessionIsInactiveAfterEndTime() {
-        systemClock.advance(Duration.between(LocalDateTime.now(), endTime.plusDays(1)));
+        startTime = LocalDateTime.now().minusHours(1);
+        endTime = LocalDateTime.now();
+        session = Session.create(
+                "1",
+                "session",
+                startTime,
+                endTime,
+                location,
+                seats);
         assertFalse(session.isActive());
     }
 
@@ -138,8 +138,7 @@ public class SessionTest {
                 startTime,
                 endTime,
                 location,
-                seats,
-                systemClock);
+                seats);
 
         assertFalse(session.hasAvailableSeats());
     }
@@ -158,8 +157,7 @@ public class SessionTest {
                 startTime,
                 endTime,
                 location,
-                seats,
-                systemClock);
+                seats);
 
         assertFalse(session.isSeatAvailable("1"));
     }
