@@ -1,1 +1,2 @@
-# ticket-lib
+# Omni Ticket Library
+

@@ -3,7 +3,10 @@ package com.alps.core.ticket;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
 import java.time.Duration;
@@ -25,6 +28,7 @@ import com.alps.infrastructure.lock.ReentrantLockProvider;
 
 public class TicketTest {
 
+    private static final String TICKET_ID = "ticket123";
     User user;
     LocationSeat locationSeat;
     Session session;
@@ -40,21 +44,122 @@ public class TicketTest {
         lockProvider = new ReentrantLockProvider();
         user = User.create("1", "John Doe", "john.doe@example.com");
         locationSeat = LocationSeat.create("1", "locationSeat", location, lockProvider, true);
-        session = Session.create("1", "Session 1", LocalDateTime.now(), LocalDateTime.now().plusHours(1), location,
-                Collections.singleton(locationSeat));
+        session = mock(Session.class);
         price = new Price(BigDecimal.valueOf(100));
-        reservation = Reservation.create("1", user, session, Collections.singleton(locationSeat), LocalDateTime.now(),
-                Duration.ofHours(2), lockProvider, new ReservationStatus(ReservationStatus.StandardStatus.PENDING), price);
+        reservation = Reservation.create(
+                "1",
+                user,
+                session,
+                Collections.singleton(locationSeat),
+                LocalDateTime.now(),
+                Duration.ofHours(2),
+                lockProvider,
+                new ReservationStatus(ReservationStatus.StandardStatus.PENDING),
+                price);
         validUntil = LocalDate.now().plusDays(1);
     }
 
     @Test
+    void assertNonNull() {
+        assertThrows(NullPointerException.class, () -> {
+            Ticket.create(
+                    null,
+                    user,
+                    locationSeat,
+                    session,
+                    reservation,
+                    price,
+                    validUntil,
+                    false);
+        });
+
+        assertThrows(NullPointerException.class, () -> {
+            Ticket.create(
+                    TICKET_ID,
+                    null,
+                    locationSeat,
+                    session,
+                    reservation,
+                    price,
+                    validUntil,
+                    false);
+        });
+
+        assertThrows(NullPointerException.class, () -> {
+            Ticket.create(
+                    TICKET_ID,
+                    user,
+                    null,
+                    session,
+                    reservation,
+                    price,
+                    validUntil,
+                    false);
+        });
+
+        assertThrows(NullPointerException.class, () -> {
+            Ticket.create(
+                    TICKET_ID,
+                    user,
+                    locationSeat,
+                    null,
+                    reservation,
+                    price,
+                    validUntil,
+                    false);
+        });
+
+        assertThrows(NullPointerException.class, () -> {
+            Ticket.create(
+                    TICKET_ID,
+                    user,
+                    locationSeat,
+                    session,
+                    null,
+                    price,
+                    validUntil,
+                    false);
+        });
+
+        assertThrows(NullPointerException.class, () -> {
+            Ticket.create(
+                    TICKET_ID,
+                    user,
+                    locationSeat,
+                    session,
+                    reservation,
+                    null,
+                    validUntil,
+                    false);
+        });
+
+        assertThrows(NullPointerException.class, () -> {
+            Ticket.create(
+                    TICKET_ID,
+                    user,
+                    locationSeat,
+                    session,
+                    reservation,
+                    price,
+                    null,
+                    false);
+        });
+    }
+
+    @Test
     void shouldCreateTicketWithCorrectDetails() {
-        String ticketId = "ticket123";
-        Ticket ticket = Ticket.create(ticketId, user, locationSeat, session, reservation, price, validUntil, false);
+        Ticket ticket = Ticket.create(
+                TICKET_ID,
+                user,
+                locationSeat,
+                session,
+                reservation,
+                price,
+                validUntil,
+                false);
 
         assertNotNull(ticket);
-        assertEquals(ticketId, ticket.getTicketId());
+        assertEquals(TICKET_ID, ticket.getTicketId());
         assertEquals(user, ticket.getUser());
         assertEquals(locationSeat, ticket.getLocationSeat());
         assertEquals(session, ticket.getSession());
@@ -66,7 +171,15 @@ public class TicketTest {
 
     @Test
     void shouldMarkTicketAsUsed() {
-        Ticket ticket = Ticket.create("ticket123", user, locationSeat, session, reservation, price, validUntil, false);
+        Ticket ticket = Ticket.create(
+                TICKET_ID,
+                user,
+                locationSeat,
+                session,
+                reservation,
+                price,
+                validUntil,
+                false);
 
         assertFalse(ticket.isUsed());
         ticket.markAsUsed();
@@ -75,11 +188,18 @@ public class TicketTest {
 
     @Test
     void shouldValidateTicketAsValid() {
-        Ticket ticket = Ticket.create("ticket123", user, locationSeat, session, reservation, price, validUntil, false);
+        validUntil = LocalDate.now().plusDays(5);
+        when(session.isActive()).thenReturn(true);
 
-        System.out.println("Ticket used: " + ticket.isUsed());
-        System.out.println("Ticket valid until: " + ticket.getValidUntil());
-        System.out.println("Session active: " + ticket.getSession().isActive());
+        Ticket ticket = Ticket.create(
+                TICKET_ID,
+                user,
+                locationSeat,
+                session,
+                reservation,
+                price,
+                validUntil,
+                false);
 
         assertTrue(ticket.isValid());
     }
@@ -87,14 +207,31 @@ public class TicketTest {
     @Test
     void shouldValidateTicketAsInvalidWhenExpired() {
         validUntil = LocalDate.now().minusDays(1);
-        Ticket ticket = Ticket.create("ticket123", user, locationSeat, session, reservation, price, validUntil, false);
+        Ticket ticket = Ticket.create(
+                TICKET_ID,
+                user,
+                locationSeat,
+                session,
+                reservation,
+                price,
+                validUntil,
+                false);
 
         assertFalse(ticket.isValid());
     }
 
     @Test
     void shouldValidateTicketAsInvalidWhenUsed() {
-        Ticket ticket = Ticket.create("ticket123", user, locationSeat, session, reservation, price, validUntil, false);
+        Ticket ticket = Ticket.create(
+                TICKET_ID,
+                user,
+                locationSeat,
+                session,
+                reservation,
+                price,
+                validUntil,
+                false);
+
         ticket.markAsUsed();
 
         assertFalse(ticket.isValid());

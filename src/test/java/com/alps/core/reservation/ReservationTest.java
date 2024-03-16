@@ -7,18 +7,14 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigDecimal;
-import java.time.Clock;
 import java.time.Duration;
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.alps.core.clock.SystemClock;
 import com.alps.core.location.Location;
 import com.alps.core.location.LocationSeat;
 import com.alps.core.lock.LockProvider;
@@ -38,8 +34,6 @@ public class ReservationTest {
     Duration expirationTime;
     ReservationStatus reservationStatus;
     LockProvider lockProvider;
-    Clock clock;
-    SystemClock systemClock;
     Price price;
 
     @BeforeEach
@@ -47,14 +41,13 @@ public class ReservationTest {
         reservationStatus = new ReservationStatus(ReservationStatus.StandardStatus.PENDING);
         location = new SomeLocation();
         lockProvider = new ReentrantLockProvider();
-        systemClock = new SystemClock(lockProvider);
         user = User.create("1", "user one", "user@email.com");
         seats = createLocationSeats();
-        session = Session.create("1", "session", LocalDateTime.now(), LocalDateTime.now(), location, seats);
+        session = Session.create("1", "session", LocalDateTime.now().minusHours(1), LocalDateTime.now().plusHours(1),
+                location, seats);
         seats = createLocationSeats();
-        creationTime = LocalDateTime.now();
-        expirationTime = Duration.ofHours(1);
-        clock = Clock.fixed(Instant.now(), ZoneId.systemDefault());
+        creationTime = LocalDateTime.now().minusDays(2); 
+        expirationTime = Duration.ofHours(24); 
         price = new Price(BigDecimal.valueOf(100));
 
         reservation = Reservation.create(
@@ -65,7 +58,7 @@ public class ReservationTest {
                 creationTime,
                 expirationTime,
                 lockProvider,
-                null,
+                reservationStatus,
                 price);
     }
 
@@ -175,8 +168,6 @@ public class ReservationTest {
                     null);
         });
 
-        
-
     }
 
     @Test
@@ -240,16 +231,28 @@ public class ReservationTest {
 
     @Test
     void shouldReturnTrueWhenReservationIsExpired() {
-        systemClock.advance(Duration.ofHours(2));
         assertTrue(reservation.isExpired());
     }
 
     @Test
-    void shouldReturnFalseWhenReservationIsNotExpired() {
-        assertFalse(reservation.isExpired());
-    }
+void shouldReturnFalseWhenReservationIsNotExpired() {
+    LocalDateTime newCreationTime = LocalDateTime.now().minusHours(1);
+    Duration newExpirationTime = Duration.ofDays(1);
 
-    private Set<LocationSeat> createLocationSeats() {
+    Reservation notExpiredReservation = Reservation.create(
+            "2",
+            user,
+            session,
+            seats,
+            newCreationTime,
+            newExpirationTime,
+            lockProvider,
+            reservationStatus,
+            price);
+
+    assertFalse(notExpiredReservation.isExpired());
+}
+    Set<LocationSeat> createLocationSeats() {
         LocationSeat locationSeat1 = LocationSeat.create("1", "location one", location, lockProvider, true);
         LocationSeat locationSeat2 = LocationSeat.create("2", "location two", location, lockProvider, true);
         LocationSeat locationSeat3 = LocationSeat.create("3", "location three", location, lockProvider, true);
