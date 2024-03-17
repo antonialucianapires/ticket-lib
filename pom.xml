@@ -3,7 +3,7 @@
    <modelVersion>4.0.0</modelVersion>
    <groupId>io.github.antonialucianapires</groupId>
    <artifactId>ticket-lib</artifactId>
-   <version>1.0.0</version>
+   <version>1.1.0</version>
    <description>A generic library for ticket reservation</description>
    <url>https://github.com/antonialucianapires/ticket-lib</url>
    <licenses>
@@ -69,6 +69,9 @@
                   </goals>
                </execution>
             </executions>
+            <configuration>
+               <autoPublish>true</autoPublish>
+            </configuration>
          </plugin>
          <plugin>
             <groupId>org.apache.maven.plugins</groupId>
@@ -133,11 +136,6 @@
             <configuration>
                <publishingServerId>central</publishingServerId>
                <tokenAuth>true</tokenAuth>
-            </configuration>
-         </plugin>
-         <plugin>
-            <configuration>
-               <autoPublish>true</autoPublish>
             </configuration>
          </plugin>
       </plugins>

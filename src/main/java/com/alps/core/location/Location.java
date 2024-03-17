@@ -1,6 +1,7 @@
 package com.alps.core.location;
 
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -12,6 +13,15 @@ import java.util.concurrent.ConcurrentHashMap;
  * characteristics unique to each location type.
  */
 public interface Location {
+
+    /**
+     * Gets the unique identifier of the location.
+     * 
+     * @return The unique identifier of the location. Default is a random UUID.
+     */
+    default String getId() {
+        return UUID.randomUUID().toString();
+    }
 
     /**
      * Gets the name of the location.

@@ -23,6 +23,7 @@ public class LocationTest {
     }
 
     class SomeLocation implements Location {
+
         @Override
         public String getAddress() {
             return "Some Address";
