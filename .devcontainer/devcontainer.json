@@ -1,5 +1,5 @@
 {
-  "image": "mcr.microsoft.com/vscode/devcontainers/java:11",
-  "features": {
+  "build": {
+    "dockerfile": "Dockerfile"
   }
 }
